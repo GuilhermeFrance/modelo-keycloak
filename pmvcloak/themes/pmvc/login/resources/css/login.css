@@ -1,0 +1,112 @@
+/* =============================================
+   Tema PMVC - Keycloak v2 (Keycloak 20+)
+   ============================================= */
+
+/* Fundo da página */
+body,
+.pf-v5-c-login,
+.pf-c-login {
+  background-color: #003580 !important;
+  background-image: none !important;
+}
+
+/* Centraliza o card na tela */
+.pf-v5-c-login,
+.pf-c-login {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 100vh !important;
+  width: 100% !important;
+}
+
+/* Remove grid interno que desvia o card */
+.pf-v5-c-login__container,
+.pf-c-login__container {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  width: 100% !important;
+  max-width: 420px !important;
+  margin: 0 auto !important;
+  padding: 0 16px !important;
+}
+
+/* Esconde o texto do realm fora do card */
+.pf-v5-c-login__header,
+.pf-c-login__header {
+  display: none !important;
+}
+
+/* Card branco */
+.pf-v5-c-login__main,
+.pf-c-login__main {
+  background-color: #ffffff !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+  max-width: 420px;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Topo do card — sem logo via CSS (controlado pelo FTL) */
+.pf-v5-c-login__main-header,
+.pf-c-login__main-header {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  background-color: transparent !important;
+  padding: 28px 24px 20px !important;
+  gap: 14px;
+}
+
+/* Título abaixo da imagem */
+.pf-v5-c-login__main-header .pf-v5-c-title,
+.pf-c-login__main-header .pf-c-title,
+.pf-v5-c-login__main-header h1,
+.pf-c-login__main-header h1 {
+  color: #003580 !important;
+  font-size: 1.3rem !important;
+  font-weight: 500 !important;
+  text-align: center !important;
+  margin: 0 !important;
+}
+
+/* Labels */
+.pf-v5-c-form__label-text,
+.pf-c-form__label-text {
+  color: #333 !important;
+}
+
+/* Inputs */
+.pf-v5-c-form-control,
+.pf-c-form-control {
+  background-color: #f5f7fa !important;
+  border-color: #c5c9d0 !important;
+  color: #003580 !important;
+}
+
+/* Placeholder dos inputs */
+.pf-v5-c-form-control::placeholder,
+.pf-c-form-control::placeholder,
+input::placeholder {
+  color: #6b7a99 !important;
+  opacity: 1 !important;
+}
+
+/* Botão Sign In */
+.pf-v5-c-button.pf-m-primary,
+.pf-c-button.pf-m-primary {
+  background-color: #003580 !important;
+  border-color: #003580 !important;
+  color: #ffffff !important;
+  font-weight: bold !important;
+}
+
+.pf-v5-c-button.pf-m-primary:hover,
+.pf-c-button.pf-m-primary:hover {
+  background-color: #b7d756 !important;
+  border-color: #b7d756 !important;
+  color: #003580 !important;
+}
