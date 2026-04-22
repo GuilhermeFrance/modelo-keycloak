@@ -5,21 +5,24 @@
 <#import "passkeys.ftl" as passkeys>
 <@layout.registrationLayout displayMessage=!messagesPerField.existsError('username','password') displayInfo=realm.password && realm.registrationAllowed && !registrationDisabled??; section>
 <!-- template: login.ftl -->
+    <#assign defaultLogo = "PMVCloak.png">
+    <#assign serverClientId = (client.clientId!"")?trim>
+    <#assign logoFile = (serverClientId?has_content)?then(serverClientId + ".png", defaultLogo)>
 
     <#if section = "header">
-        <#-- Carrega automaticamente a imagem com o mesmo nome do clientId.
-             Basta colocar um PNG em resources/img/<clientId>.png
-             Ex: client "modelo-pmvc" → img/modelo-pmvc.png
-             Se não encontrar, exibe o logo padrão PMVCloak.png -->
-        <#assign logoFile = (client??)?then(client.clientId, "PMVCloak") + ".png">
-        <img src="${url.resourcesPath}/img/${logoFile}"
-             alt="Logo"
-             onerror="this.src='${url.resourcesPath}/img/PMVCloak.png'"
-             style="display:block; margin: 0 auto 12px; max-width:240px; height:auto;" />
-        ${msg("loginAccountTitle")}
+        
     <#elseif section = "form">
         <div id="kc-form">
           <div id="kc-form-wrapper">
+            <div style="text-align:center; margin: 0 0 16px 0;">
+                <img id="pmvc-client-logo"
+                     src="${url.resourcesPath}/img/${logoFile}"
+                     alt="Logo"
+                     style="display:inline-block; max-width:280px; height:auto;" />
+            </div>
+            <div style="text-align:center; margin: 0 0 18px 0; color:#003580; font-size:1.3rem; font-weight:500;">
+                ${msg("loginAccountTitle")}
+            </div>
             <#if realm.password>
                 <form id="kc-form-login" class="${properties.kcFormClass!}" onsubmit="login.disabled = true; return true;" action="${url.loginAction}" method="post" novalidate="novalidate">
                     <#if !usernameHidden??>

@@ -12,6 +12,7 @@
           abreviações"
           clearable
           clear-icon="close"
+          disable
           :rules="nameRules"
         />
       </div>
@@ -24,6 +25,7 @@
           label="Email"
           hint="Informe o email"
           clearable
+          disable
           clear-icon="close"
           :rules="emailRules"
         />
@@ -131,7 +133,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { ref, watch } from 'vue';
 import { api } from 'boot/axios';
 import { useQuasar } from 'quasar';
 
@@ -166,6 +168,8 @@ const props = defineProps({
     default: false,
   },
 });
+
+console.log(props.administrator);
 
 const password_confirmation = ref('');
 const level_access_options = ref(['Usuário', 'Administrador']);
@@ -234,25 +238,54 @@ async function findUser(id) {
   return data;
 }
 
+function normalizeNivel(nivel) {
+  if (!nivel) return '';
+
+  const value = String(nivel).toUpperCase();
+
+  if (value === 'ADMIN' || value === 'ADMINISTRADOR') return 'Administrador';
+  if (value === 'USUARIO' || value === 'USUÁRIO') return 'Usuário';
+
+  return nivel;
+}
+
+function normalizeSituacao(situacao) {
+  if (!situacao) return '';
+
+  const value = String(situacao).toUpperCase();
+
+  if (value === 'ATIVO') return 'Ativo';
+  if (value === 'INATIVO') return 'Inativo';
+
+  return situacao;
+}
+
 function fillInFields(data) {
-  form.value.nome = data.nome;
-  form.value.email = data.email;
-  form.value.nivel = data.nivel;
-  form.value.situacao = data.situacao;
-  form.value.login = data.login;
+  form.value.nome = data.nome || '';
+  form.value.email = data.email || '';
+  form.value.nivel = normalizeNivel(data.nivel);
+  form.value.situacao = normalizeSituacao(data.situacao);
+  form.value.login = data.login || '';
 }
 
 function sendData() {
   emits('submitData', form.value);
 }
 
-onMounted(async () => {
-  if (props.userId) {
-    const data = await findUser(props.userId);
+watch(
+  () => props.userId,
+  async (userId) => {
+    if (!userId) return;
 
-    fillInFields(data);
-  }
-});
+    try {
+      const data = await findUser(userId);
+      fillInFields(data);
+    } catch (error) {
+      console.error('Erro ao carregar dados do perfil:', error);
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <style scoped>

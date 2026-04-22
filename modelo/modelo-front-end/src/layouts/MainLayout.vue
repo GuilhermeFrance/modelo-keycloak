@@ -94,9 +94,12 @@ import EssentialLink from 'components/common/EssentialLink.vue';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import { useAuthStore } from '../stores/authStore';
+import keycloak from 'src/plugins/keycloak';
+import { api } from 'src/boot/axios';
 
 onMounted(() => {
   configurarMenu();
+  KeycloakSync();
 });
 
 const router = useRouter();
@@ -107,16 +110,29 @@ const access = ref('');
 const userName = ref('');
 const links = ref([]);
 
+const isAdmin =
+  keycloak.hasRealmRole('admin') ||
+  keycloak.hasResourceRole('admin', keycloak.clientId);
+
 function getFirstName(name) {
   const firstName = name.split(' ')[0];
   return (userName.value = firstName);
 }
 
+async function KeycloakSync() {
+  try {
+    const response = await api.get('/usuarios/me');
+    console.log(response.data);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 function configurarMenu() {
-  const accessLevel = window.sessionStorage.getItem('access_level');
-  const userName = window.sessionStorage.getItem('name_user');
+
+  const userName = keycloak.tokenParsed?.name;
   getFirstName(userName ? userName : 'Maria Silva');
-  if (accessLevel === 'ADMIN') {
+  if (isAdmin) {
     // ITENS DE NAVEGAÇÃO ADMIN
 
     links.value.push(
@@ -163,7 +179,6 @@ async function profile() {
 }
 
 async function logout() {
-  router.push('/login');
-  authStore.logout();
+  await authStore.logout();
 }
 </script>

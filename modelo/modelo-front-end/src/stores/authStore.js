@@ -21,8 +21,8 @@ export const useAuthStore = defineStore('auth', {
       }
       this.isAdmin = keycloak.hasRealmRole('admin');
     },
-    logout() {
-      keycloak.logout({ redirectUri: window.location.origin });
+    async logout() {
+      await keycloak.logout({ redirectUri: window.location.origin });
     },
   },
 });
