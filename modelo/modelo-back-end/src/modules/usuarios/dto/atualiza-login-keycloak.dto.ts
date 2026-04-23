@@ -9,4 +9,12 @@ export class AtualizaLoginKeycloakDto {
   @IsString({ message: 'O login deve ser uma string.' })
   @MinLength(3, { message: 'O login deve ter no mínimo 3 caracteres.' })
   readonly login: string;
+
+  @ApiProperty({
+    description:
+      'Nova senha (password) do usuário no Keycloak e na base local.',
+  })
+  @IsString({ message: 'O login deve ser uma string.' })
+  @MinLength(6, { message: 'O login deve ter no mínimo 3 caracteres.' })
+  readonly senha: string;
 }

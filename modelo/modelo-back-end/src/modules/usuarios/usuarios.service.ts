@@ -232,6 +232,7 @@ export class UsuariosService {
 
   async atualizaLoginNoKeycloak(sub: string, data: AtualizaLoginKeycloakDto) {
     const novoLogin = data.login.trim();
+    const novaSenha = data.senha.trim();
 
     if (!novoLogin) {
       throw new BadRequestException('O login informado é inválido.');
@@ -283,6 +284,7 @@ export class UsuariosService {
         },
         {
           username: novoLogin,
+          credentials: [{ type: 'password', value: novaSenha }],
         },
       );
     } catch (error: any) {
@@ -296,7 +298,9 @@ export class UsuariosService {
       }
 
       throw new InternalServerErrorException(
-        `Erro ao atualizar login no Keycloak. [${status}] ${JSON.stringify(body)}`,
+        `Erro ao atualizar login no Keycloak. [${status}] ${JSON.stringify(
+          body,
+        )}`,
       );
     }
 

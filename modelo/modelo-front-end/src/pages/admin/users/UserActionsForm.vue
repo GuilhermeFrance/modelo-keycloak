@@ -3,7 +3,7 @@
     <CtiCard :title="define_title" iconName="person_add">
       <FormUser
         :userId="id ? id : null"
-        :administrator=administrador
+        :administrator="administrador"
         :labelButtonSave="id ? 'Atualizar' : 'Cadastrar'"
         :showBackButton="true"
         @submitData="submitData"
@@ -22,7 +22,9 @@ import { useRouter, useRoute } from 'vue-router';
 import { computed, onMounted, ref } from 'vue';
 import keycloak from 'src/plugins/keycloak';
 
-const administrador = keycloak.hasRealmRole('admin') || keycloak.hasResourceRole('admin', keycloak.clientId)
+const administrador =
+  keycloak.hasRealmRole('admin') ||
+  keycloak.hasResourceRole('admin', keycloak.clientId);
 
 const $q = useQuasar();
 const router = useRouter();
