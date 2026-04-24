@@ -14,6 +14,8 @@ import { ConfigService } from '@nestjs/config';
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 import * as bcrypt from 'bcrypt';
 import { Nivel, Situacao } from '@prisma/client';
+import { KeycloakAdminService } from '../keycloak/keycloak.service';
+import { UserKeycloakDto } from './dto/cria-usuario-keycloak';
 
 @Injectable()
 export class UsuariosService {
@@ -21,6 +23,7 @@ export class UsuariosService {
     private readonly prismaService: PrismaService,
     private readonly paginateService: PaginateService,
     private readonly configService: ConfigService,
+    private readonly kcAdminClient: KeycloakAdminService,
   ) {}
 
   async cria(data: CriaUsuarioDto): Promise<any> {
@@ -34,6 +37,36 @@ export class UsuariosService {
     });
 
     return usuario;
+  }
+
+  async criaUserKeycloak(data: UserKeycloakDto) {
+    const kcClient = await this.kcAdminClient.getClient();
+
+    try {
+      const user = await kcClient.users.findOne({
+        realm: process.env.KEYCLOAK_REALM,
+        id: data.email,
+      });
+      if (user) {
+        throw new BadRequestException('Usuário já existe');
+      }
+      await kcClient.users.create({
+        realm: process.env.KEYCLOAK_REALM,
+        username: data.username,
+        email: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        enabled: true,
+        emailVerified: true,
+        credentials: [
+          {
+            type: 'password',
+            value: '123@mudar',
+            temporary: true,
+          },
+        ],
+      });
+    } catch (err) {}
   }
 
   async buscaOuCriaPorSub(tokenPayload: {
@@ -232,7 +265,7 @@ export class UsuariosService {
 
   async atualizaLoginNoKeycloak(sub: string, data: AtualizaLoginKeycloakDto) {
     const novoLogin = data.login.trim();
-    const novaSenha = data.senha.trim();
+    const novaSenha = data.senha?.trim() || undefined;
 
     if (!novoLogin) {
       throw new BadRequestException('O login informado é inválido.');
@@ -261,33 +294,23 @@ export class UsuariosService {
       throw new ConflictException('Esse login já existe na base de dados.');
     }
 
-    const kcAdmin = new KcAdminClient({
-      baseUrl: this.configService.get<string>('KEYCLOAK_URL'),
-      realmName:
-        this.configService.get<string>('KEYCLOAK_ADMIN_REALM') || 'master',
-    });
-
-    await kcAdmin.auth({
-      username: this.configService.get<string>('KEYCLOAK_ADMIN_USER'),
-      password: this.configService.get<string>('KEYCLOAK_ADMIN_PASS'),
-      grantType: 'password',
-      clientId:
-        this.configService.get<string>('KEYCLOAK_ADMIN_CLIENT_ID') ||
-        'admin-cli',
-    });
+    const kcClient = await this.kcAdminClient.getClient();
 
     try {
-      await kcAdmin.users.update(
+      await kcClient.users.update(
         {
           realm: this.configService.get<string>('KEYCLOAK_REALM'),
           id: sub,
         },
         {
           username: novoLogin,
-          credentials: [{ type: 'password', value: novaSenha }],
+          ...(novaSenha && {
+            credentials: [{ type: 'password', value: novaSenha }],
+          }),
         },
       );
     } catch (error: any) {
+      console.log(error);
       const status = error?.response?.status ?? error?.responseData?.status;
       const body =
         error?.response?.data ?? error?.responseData ?? error?.message;

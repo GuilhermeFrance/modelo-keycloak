@@ -26,6 +26,7 @@ import { CriaUsuarioDto } from './dto/cria-usuario.dto';
 import { UsuariosService } from './usuarios.service';
 import { Request } from 'express';
 import { AtualizaLoginKeycloakDto } from './dto/atualiza-login-keycloak.dto';
+import { UserKeycloakDto } from './dto/cria-usuario-keycloak';
 
 @ApiBearerAuth()
 @Controller('usuarios')
@@ -52,6 +53,10 @@ export class UsuariosController {
       filtro?.split(','),
       valor?.split(','),
     );
+  }
+  @Post('/keycloak')
+  async criaUserKeycloak(@Body() data: UserKeycloakDto) {
+    return await this.usuarioService.criaUserKeycloak(data);
   }
 
   @Get('/me')
